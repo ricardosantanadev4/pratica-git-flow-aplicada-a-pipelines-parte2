@@ -126,3 +126,27 @@ jobs:
       # Executa o build.
       - name: Build da aplicação
         run: npm run build
+  # =================================================
+  # Job 3 - Testes
+  #
+  # Executa os testes automatizados.
+  # =================================================
+  tests:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar testes
+        run: npm test
