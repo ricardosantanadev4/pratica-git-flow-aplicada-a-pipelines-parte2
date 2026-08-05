@@ -1,0 +1,78 @@
+# ===================================================
+# Nome da pipeline
+# Será exibido na aba GitHub Actions.
+# ===================================================
+name: Pipeline Git Flow
+
+# ===================================================
+# O bloco "on" define os gatilhos da pipeline.
+#
+# Em YAML a indentação é obrigatória.
+# Utilize apenas espaços.
+# Nunca utilize TAB.
+# Comentários são feitos utilizando "#".
+# ===================================================
+on:
+
+  # -------------------------------------------------
+  # Executa quando ocorre um push para determinadas
+  # branches.
+  # -------------------------------------------------
+  push:
+
+    branches:
+
+      # Branch de produção
+      - main
+
+      # Branch de desenvolvimento
+      - develop
+
+      # Todas as branches de funcionalidades
+      # Exemplo:
+      # feature/login
+      # feature/cadastro
+      - "feature/**"
+
+  # -------------------------------------------------
+  # Executa quando um Pull Request é aberto,
+  # atualizado ou sincronizado.
+  # -------------------------------------------------
+  pull_request:
+
+    branches:
+      - main
+      - develop
+      - "feature/**"
+
+  # =================================================
+  # Gatilhos pesquisados na documentação
+  # =================================================
+
+  # Permite executar a pipeline manualmente.
+  workflow_dispatch:
+
+  # Executa automaticamente em horários programados.
+  schedule:
+
+    # Todos os dias às 03:00 UTC.
+    - cron: "0 3 * * *"
+
+  # Executa quando uma Release é publicada.
+  release:
+
+    types:
+      - published
+
+  # Executa quando uma Issue é criada ou fechada.
+  issues:
+
+    types:
+      - opened
+      - closed
+
+  # Executa quando uma branch ou tag é criada.
+  create:
+
+  # Executa quando uma branch ou tag é removida.
+  delete:
