@@ -2,7 +2,7 @@
 # Nome da pipeline
 # Será exibido na aba GitHub Actions.
 # ===================================================
-name: Pipeline Git Flow
+name: minha-principal
 
 # ===================================================
 # O bloco "on" define os gatilhos da pipeline.
@@ -13,15 +13,12 @@ name: Pipeline Git Flow
 # Comentários são feitos utilizando "#".
 # ===================================================
 on:
-
   # -------------------------------------------------
   # Executa quando ocorre um push para determinadas
   # branches.
   # -------------------------------------------------
   push:
-
     branches:
-
       # Branch de produção
       - main
 
@@ -39,7 +36,6 @@ on:
   # atualizado ou sincronizado.
   # -------------------------------------------------
   pull_request:
-
     branches:
       - main
       - develop
@@ -54,19 +50,16 @@ on:
 
   # Executa automaticamente em horários programados.
   schedule:
-
     # Todos os dias às 03:00 UTC.
     - cron: "0 3 * * *"
 
   # Executa quando uma Release é publicada.
   release:
-
     types:
       - published
 
   # Executa quando uma Issue é criada ou fechada.
   issues:
-
     types:
       - opened
       - closed
@@ -76,3 +69,29 @@ on:
 
   # Executa quando uma branch ou tag é removida.
   delete:
+
+# ===================================================
+# Variáveis de ambiente disponíveis para todos os jobs.
+# ===================================================
+env:
+  NODE_VERSION: "20"
+
+# ===================================================
+# JOBS
+#
+# Cada job executa em uma máquina virtual separada.
+# Os jobs podem executar em paralelo ou em sequência.
+# ===================================================
+jobs:
+  # =================================================
+  # Job 1 - Checkout do projeto
+  #
+  # Responsável por baixar o código do repositório.
+  # =================================================
+  checkout:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Faz o download do código fonte.
+      - name: Checkout do projeto
+        uses: actions/checkout@v4
