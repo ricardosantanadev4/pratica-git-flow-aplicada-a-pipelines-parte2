@@ -1,0 +1,227 @@
+# ===================================================
+# Nome da pipeline
+# Será exibido na aba GitHub Actions.
+# ===================================================
+name: minha-principal
+
+# ===================================================
+# O bloco "on" define os gatilhos da pipeline.
+#
+# Em YAML a indentação é obrigatória.
+# Utilize apenas espaços.
+# Nunca utilize TAB.
+# Comentários são feitos utilizando "#".
+# ===================================================
+on:
+  # -------------------------------------------------
+  # Executa quando ocorre um push para determinadas
+  # branches.
+  # -------------------------------------------------
+  push:
+    branches:
+      # Branch de produção
+      - main
+
+      # Branch de desenvolvimento
+      - develop
+
+      # Todas as branches de funcionalidades
+      # Exemplo:
+      # feature/login
+      # feature/cadastro
+      - "feature/**"
+
+  # -------------------------------------------------
+  # Executa quando um Pull Request é aberto,
+  # atualizado ou sincronizado.
+  # -------------------------------------------------
+  pull_request:
+    branches:
+      - main
+      - develop
+      - "feature/**"
+
+  # =================================================
+  # Gatilhos pesquisados na documentação
+  # =================================================
+
+  # Permite executar a pipeline manualmente.
+  workflow_dispatch:
+
+  # Executa automaticamente em horários programados.
+  schedule:
+    # Todos os dias às 03:00 UTC.
+    - cron: "0 3 * * *"
+
+  # Executa quando uma Release é publicada.
+  release:
+    types:
+      - published
+
+  # Executa quando uma Issue é criada ou fechada.
+  issues:
+    types:
+      - opened
+      - closed
+
+  # Executa quando uma branch ou tag é criada.
+  create:
+
+  # Executa quando uma branch ou tag é removida.
+  delete:
+
+# ===================================================
+# Variáveis de ambiente disponíveis para todos os jobs.
+# ===================================================
+env:
+  NODE_VERSION: "20"
+
+# ===================================================
+# JOBS
+#
+# Cada job executa em uma máquina virtual separada.
+# Os jobs podem executar em paralelo ou em sequência.
+# ===================================================
+jobs:
+  # =================================================
+  # Job 1 - Checkout do projeto
+  #
+  # Responsável por baixar o código do repositório.
+  # =================================================
+  checkout:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Faz o download do código fonte.
+      - name: Checkout do projeto
+        uses: actions/checkout@v4
+
+  # =================================================
+  # Job 2 - Build
+  #
+  # Responsável por preparar o ambiente e instalar
+  # dependências do projeto.
+  # =================================================
+  build:
+    runs-on: ubuntu-latest
+
+    # Só executa após o checkout terminar.
+    needs: checkout
+
+    steps:
+      # Baixa o código.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Instala a versão do Node.js.
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Instala as dependências.
+      - name: Instalar dependências
+        run: npm install
+
+      # Executa o build.
+      - name: Build da aplicação
+        run: npm run build
+  # =================================================
+  # Job 3 - Testes
+  #
+  # Executa os testes automatizados.
+  # =================================================
+  tests:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar testes
+        run: npm test
+  # =================================================
+  # Job 4 - Lint
+  #
+  # Analisa o código procurando erros de padrão,
+  # qualidade e estilo.
+  # =================================================
+  lint:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar Lint
+        run: npm run lint
+  # =================================================
+  # Job 5 - Upload de Artefatos
+  #
+  # Salva arquivos gerados durante o build para
+  # download posterior.
+  # =================================================
+  upload-artifact:
+    runs-on: ubuntu-latest
+
+    needs:
+      - build
+      - tests
+      - lint
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Gerar arquivo de exemplo
+        run: |
+          mkdir artefatos
+          echo "Pipeline executada com sucesso." > artefatos/resultado.txt
+
+      - name: Enviar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultado-pipeline
+          path: artefatos/
+  # =================================================
+  # Job 6 - Deploy
+  #
+  # Simula um processo de entrega contínua (CD).
+  # Executa apenas na branch main.
+  # =================================================
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs:
+      - tests
+      - lint
+
+    # Só faz deploy se estiver na branch main.
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Simular Deploy
+        run: echo "Realizando deploy da aplicação..."
