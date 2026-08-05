@@ -95,3 +95,34 @@ jobs:
       # Faz o download do código fonte.
       - name: Checkout do projeto
         uses: actions/checkout@v4
+
+  # =================================================
+  # Job 2 - Build
+  #
+  # Responsável por preparar o ambiente e instalar
+  # dependências do projeto.
+  # =================================================
+  build:
+    runs-on: ubuntu-latest
+
+    # Só executa após o checkout terminar.
+    needs: checkout
+
+    steps:
+      # Baixa o código.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Instala a versão do Node.js.
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Instala as dependências.
+      - name: Instalar dependências
+        run: npm install
+
+      # Executa o build.
+      - name: Build da aplicação
+        run: npm run build
